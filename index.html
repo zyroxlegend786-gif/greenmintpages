@@ -104,6 +104,39 @@ iframe{
 
 a{color:#38bdf8;text-decoration:none}
 #auth button{margin-left:10px}
+
+/* TERMINAL OVERLAY */
+#terminalOverlay{
+  position:fixed;
+  inset:0;
+  background:#020617dd;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+#terminal{
+  width:90%;
+  max-width:520px;
+  background:black;
+  border-radius:14px;
+  border:1px solid #22c55e55;
+  padding:16px;
+  font-family:ui-monospace,monospace;
+  color:#22c55e;
+  box-shadow:0 0 40px #000;
+}
+
+#terminal h4{
+  margin:0 0 10px;
+  color:#4ade80;
+  font-weight:600;
+}
+
+#logs div{
+  margin-bottom:6px;
+}
 </style>
 </head>
 
@@ -114,6 +147,14 @@ a{color:#38bdf8;text-decoration:none}
 </header>
 
 <div id="app"></div>
+
+<!-- TERMINAL -->
+<div id="terminalOverlay">
+  <div id="terminal">
+    <h4>GREENmint Terminal</h4>
+    <div id="logs"></div>
+  </div>
+</div>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -254,60 +295,66 @@ function deployUI(){
     </div>`;
 }
 
-/* DEPLOY (5 LIMIT) */
+/* TERMINAL SIM */
+function runTerminal(cb){
+  const overlay=document.getElementById("terminalOverlay");
+  const logs=document.getElementById("logs");
+  logs.innerHTML="";
+  overlay.style.display="flex";
+
+  const steps=[
+    "Connecting to GREENmint server...",
+    "Uploading site bundle...",
+    "Finalizing deployment...",
+    "✅ Deployed successfully"
+  ];
+
+  steps.forEach((msg,i)=>{
+    setTimeout(()=>{
+      const d=document.createElement("div");
+      d.textContent=msg;
+      logs.appendChild(d);
+      if(i===steps.length-1){
+        setTimeout(()=>{
+          overlay.style.display="none";
+          cb();
+        },800);
+      }
+    },i*1200);
+  });
+}
+
+/* DEPLOY */
 function deploy(){
   const name=document.getElementById("name").value.trim();
   if(!name) return alert("Enter site name");
 
   const uid=auth.currentUser.uid;
 
-  if(editingId){
-    db.ref("sites/"+editingId).update({
-      uid,name,html:tempCode,time:Date.now()
-    });
-    alert("Updated ✅");
-    return dashboard();
-  }
-
-  db.ref("sites").orderByChild("uid")
-  .equalTo(uid)
-  .once("value",snap=>{
-    if(snap.numChildren()>=5){
-      alert("❌ Limit reached: Only 5 sites allowed");
-      return;
+  runTerminal(()=>{
+    if(editingId){
+      db.ref("sites/"+editingId).update({
+        uid,name,html:tempCode,time:Date.now()
+      });
+      alert("Updated ✅");
+      return dashboard();
     }
-    db.ref("sites").push({
-      uid,name,html:tempCode,time:Date.now()
+
+    db.ref("sites").orderByChild("uid")
+    .equalTo(uid)
+    .once("value",snap=>{
+      if(snap.numChildren()>=5){
+        alert("❌ Limit reached: Only 5 sites allowed");
+        return;
+      }
+      db.ref("sites").push({
+        uid,name,html:tempCode,time:Date.now()
+      });
+      alert("Deployed 🚀");
+      dashboard();
     });
-    alert("Deployed 🚀");
-    dashboard();
   });
 }
-
-/* ⌨️ KEYBOARD SUPPORT */
-document.addEventListener("keydown",e=>{
-  if(!auth.currentUser) return;
-
-  if(e.ctrlKey && e.key==="Enter" && currentView==="ide"){
-    e.preventDefault();
-    preview();
-  }
-
-  if(e.ctrlKey && e.key.toLowerCase()==="s" && currentView==="ide"){
-    e.preventDefault();
-    preview();
-  }
-
-  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==="d" && currentView==="ide"){
-    e.preventDefault();
-    deployUI();
-  }
-
-  if(e.key==="Escape"){
-    if(currentView==="deploy") openIDE();
-    else if(currentView==="ide") dashboard();
-  }
-});
 </script>
 </body>
 </html>
