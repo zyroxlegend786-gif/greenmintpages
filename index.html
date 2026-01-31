@@ -66,7 +66,6 @@ button{
   border-radius:10px;
   font-weight:600;
   cursor:pointer;
-  transition:.25s;
 }
 button:hover{transform:translateY(-1px)}
 
@@ -139,6 +138,7 @@ const authBox=document.getElementById("auth");
 
 let tempCode=`<!DOCTYPE html><html><body><h1>Hello GreenPages 🌿</h1></body></html>`;
 let editingId=null;
+let currentView="dashboard";
 
 /* AUTH */
 auth.onAuthStateChanged(user=>{
@@ -171,6 +171,7 @@ function login(){
 
 /* DASHBOARD */
 function dashboard(){
+  currentView="dashboard";
   editingId=null;
   app.innerHTML=`
     <div class="card row">
@@ -179,6 +180,9 @@ function dashboard(){
     </div>
     <div id="list"></div>
   `;
+
+  const list=document.getElementById("list");
+  list.innerHTML="";
 
   db.ref("sites").orderByChild("uid")
   .equalTo(auth.currentUser.uid)
@@ -221,6 +225,7 @@ function editSite(id){
 }
 
 function openIDE(){
+  currentView="ide";
   app.innerHTML=`
     <div class="card">
       <textarea id="code">${tempCode}</textarea><br><br>
@@ -240,6 +245,7 @@ function preview(){
 
 /* DEPLOY UI */
 function deployUI(){
+  currentView="deploy";
   app.innerHTML=`
     <div class="card">
       <input id="name" placeholder="site-name"><br><br>
@@ -248,14 +254,13 @@ function deployUI(){
     </div>`;
 }
 
-/* DEPLOY WITH 5 SITE LIMIT */
+/* DEPLOY (5 LIMIT) */
 function deploy(){
   const name=document.getElementById("name").value.trim();
   if(!name) return alert("Enter site name");
 
   const uid=auth.currentUser.uid;
 
-  // EDIT MODE = no limit
   if(editingId){
     db.ref("sites/"+editingId).update({
       uid,name,html:tempCode,time:Date.now()
@@ -264,15 +269,13 @@ function deploy(){
     return dashboard();
   }
 
-  // CREATE MODE = LIMIT CHECK
   db.ref("sites").orderByChild("uid")
   .equalTo(uid)
   .once("value",snap=>{
-    if(snap.numChildren() >= 5){
+    if(snap.numChildren()>=5){
       alert("❌ Limit reached: Only 5 sites allowed");
       return;
     }
-
     db.ref("sites").push({
       uid,name,html:tempCode,time:Date.now()
     });
@@ -280,6 +283,31 @@ function deploy(){
     dashboard();
   });
 }
+
+/* ⌨️ KEYBOARD SUPPORT */
+document.addEventListener("keydown",e=>{
+  if(!auth.currentUser) return;
+
+  if(e.ctrlKey && e.key==="Enter" && currentView==="ide"){
+    e.preventDefault();
+    preview();
+  }
+
+  if(e.ctrlKey && e.key.toLowerCase()==="s" && currentView==="ide"){
+    e.preventDefault();
+    preview();
+  }
+
+  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==="d" && currentView==="ide"){
+    e.preventDefault();
+    deployUI();
+  }
+
+  if(e.key==="Escape"){
+    if(currentView==="deploy") openIDE();
+    else if(currentView==="ide") dashboard();
+  }
+});
 </script>
 </body>
 </html>
