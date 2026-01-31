@@ -10,7 +10,6 @@
   --bg:#020617;
   --card:#020617cc;
   --border:#1e293b;
-  --muted:#94a3b8;
   --green:#22c55e;
   --blue:#38bdf8;
   --red:#ef4444;
@@ -27,7 +26,6 @@ body{
   color:#e5e7eb;
 }
 
-/* HEADER */
 header{
   padding:16px 24px;
   border-bottom:1px solid var(--border);
@@ -37,40 +35,23 @@ header{
   backdrop-filter:blur(12px);
   position:sticky;
   top:0;
-  z-index:10;
 }
 
-header b{
-  font-size:18px;
-  letter-spacing:.4px;
-}
-
-/* APP */
 #app{
   max-width:1150px;
   margin:auto;
   padding:26px 20px 80px;
 }
 
-/* CARD */
 .card{
   background:linear-gradient(180deg,#020617ee,#020617aa);
   border:1px solid var(--border);
   border-radius:18px;
   padding:18px;
   margin-bottom:16px;
-  box-shadow:
-    0 0 0 1px #020617 inset,
-    0 20px 40px -20px black;
-  animation:fade .35s ease;
+  box-shadow:0 20px 40px -20px black;
 }
 
-@keyframes fade{
-  from{opacity:0;transform:translateY(6px)}
-  to{opacity:1;transform:none}
-}
-
-/* ROW */
 .row{
   display:flex;
   justify-content:space-between;
@@ -79,7 +60,6 @@ header b{
   flex-wrap:wrap;
 }
 
-/* BUTTONS */
 button{
   padding:9px 16px;
   border:none;
@@ -88,28 +68,12 @@ button{
   cursor:pointer;
   transition:.25s;
 }
+button:hover{transform:translateY(-1px)}
 
-button:hover{
-  transform:translateY(-1px);
-  filter:brightness(1.1);
-}
+.green{background:#22c55e;color:#022c22}
+.gray{background:#334155;color:white}
+.red{background:#ef4444;color:white}
 
-.green{
-  background:linear-gradient(135deg,#22c55e,#4ade80);
-  color:#022c22;
-}
-
-.gray{
-  background:#334155;
-  color:white;
-}
-
-.red{
-  background:linear-gradient(135deg,#ef4444,#f87171);
-  color:white;
-}
-
-/* INPUT */
 input{
   width:100%;
   padding:12px;
@@ -117,32 +81,19 @@ input{
   border:1px solid var(--border);
   background:#020617;
   color:white;
-  font-size:15px;
 }
 
-/* TEXTAREA */
 textarea{
   width:100%;
   height:300px;
-  background:
-    linear-gradient(transparent 95%,#022c22),
-    #020617;
+  background:#020617;
   color:#22c55e;
   border:1px solid var(--border);
   border-radius:16px;
   padding:18px;
-  font-family:ui-monospace,monospace;
-  font-size:14px;
-  outline:none;
-  line-height:1.6;
+  font-family:monospace;
 }
 
-textarea:focus{
-  border-color:#22c55e;
-  box-shadow:0 0 0 2px #22c55e33;
-}
-
-/* PREVIEW */
 iframe{
   width:100%;
   height:340px;
@@ -152,22 +103,8 @@ iframe{
   margin-top:14px;
 }
 
-/* LINKS */
-a{
-  color:var(--blue);
-  text-decoration:none;
-  font-weight:500;
-}
-a:hover{text-decoration:underline}
-
-/* AUTH */
+a{color:#38bdf8;text-decoration:none}
 #auth button{margin-left:10px}
-
-/* MOBILE */
-@media(max-width:600px){
-  textarea{height:240px}
-  iframe{height:280px}
-}
 </style>
 </head>
 
@@ -185,7 +122,6 @@ a:hover{text-decoration:underline}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-/* FIREBASE */
 firebase.initializeApp({
   apiKey: "AIzaSyBJ-Ki5RueLv0_JatYBaoEatlZS4WD9ZMY",
   authDomain: "greenpages-cc200.firebaseapp.com",
@@ -196,40 +132,36 @@ firebase.initializeApp({
   appId: "1:939676595663:web:39fe97fe23f31bebcd4eba"
 });
 
-const auth = firebase.auth();
-const db = firebase.database();
-const app = document.getElementById("app");
-const authBox = document.getElementById("auth");
+const auth=firebase.auth();
+const db=firebase.database();
+const app=document.getElementById("app");
+const authBox=document.getElementById("auth");
 
-/* STATE */
-let tempCode = localStorage.getItem("tempCode") ||
-`<!DOCTYPE html><html><body><h1>Hello GreenPages 🌿</h1></body></html>`;
-let editingId = null;
+let tempCode=`<!DOCTYPE html><html><body><h1>Hello GreenPages 🌿</h1></body></html>`;
+let editingId=null;
 
 /* AUTH */
 auth.onAuthStateChanged(user=>{
-  const q = new URLSearchParams(location.search);
+  const q=new URLSearchParams(location.search);
 
   if(q.get("site")){
-    db.ref("sites/"+q.get("site")).once("value", s=>{
+    db.ref("sites/"+q.get("site")).once("value",s=>{
       if(s.exists()){
         document.open();
         document.write(s.val().html);
         document.close();
-      }else{
-        app.innerHTML="<h2>Site not found</h2>";
-      }
+      }else app.innerHTML="<h2>Site not found</h2>";
     });
     return;
   }
 
   if(user){
-    authBox.innerHTML = `${user.displayName}
+    authBox.innerHTML=`${user.displayName}
       <button class="gray" onclick="auth.signOut()">Logout</button>`;
     dashboard();
   }else{
-    authBox.innerHTML = `<button class="green" onclick="login()">Login</button>`;
-    app.innerHTML = `<h2>Login to use GreenPages 🌿</h2>`;
+    authBox.innerHTML=`<button class="green" onclick="login()">Login</button>`;
+    app.innerHTML=`<h2>Login to use GreenPages 🌿</h2>`;
   }
 });
 
@@ -248,12 +180,9 @@ function dashboard(){
     <div id="list"></div>
   `;
 
-  const list=document.getElementById("list");
-  list.innerHTML="";
-
   db.ref("sites").orderByChild("uid")
   .equalTo(auth.currentUser.uid)
-  .once("value", snap=>{
+  .once("value",snap=>{
     snap.forEach(s=>{
       const d=s.val();
       list.innerHTML+=`
@@ -264,8 +193,7 @@ function dashboard(){
             <button class="gray" onclick="editSite('${s.key}')">Edit</button>
             <button class="red" onclick="delSite('${s.key}')">Delete</button>
           </div>
-        </div>
-      `;
+        </div>`;
     });
   });
 }
@@ -285,7 +213,7 @@ function newSite(){
 }
 
 function editSite(id){
-  db.ref("sites/"+id).once("value", s=>{
+  db.ref("sites/"+id).once("value",s=>{
     editingId=id;
     tempCode=s.val().html;
     openIDE();
@@ -310,36 +238,47 @@ function preview(){
   document.getElementById("view").srcdoc=tempCode;
 }
 
-/* DEPLOY */
+/* DEPLOY UI */
 function deployUI(){
   app.innerHTML=`
     <div class="card">
       <input id="name" placeholder="site-name"><br><br>
       <button class="green" onclick="deploy()">Confirm Deploy</button>
       <button class="gray" onclick="openIDE()">Back</button>
-    </div>
-  `;
+    </div>`;
 }
 
+/* DEPLOY WITH 5 SITE LIMIT */
 function deploy(){
   const name=document.getElementById("name").value.trim();
   if(!name) return alert("Enter site name");
 
-  const data={
-    uid:auth.currentUser.uid,
-    name,
-    html:tempCode,
-    time:Date.now()
-  };
+  const uid=auth.currentUser.uid;
 
+  // EDIT MODE = no limit
   if(editingId){
-    db.ref("sites/"+editingId).update(data);
+    db.ref("sites/"+editingId).update({
+      uid,name,html:tempCode,time:Date.now()
+    });
     alert("Updated ✅");
-  }else{
-    db.ref("sites").push(data);
-    alert("Deployed 🚀");
+    return dashboard();
   }
-  dashboard();
+
+  // CREATE MODE = LIMIT CHECK
+  db.ref("sites").orderByChild("uid")
+  .equalTo(uid)
+  .once("value",snap=>{
+    if(snap.numChildren() >= 5){
+      alert("❌ Limit reached: Only 5 sites allowed");
+      return;
+    }
+
+    db.ref("sites").push({
+      uid,name,html:tempCode,time:Date.now()
+    });
+    alert("Deployed 🚀");
+    dashboard();
+  });
 }
 </script>
 </body>
