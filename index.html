@@ -1,128 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Green Pages</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Green Pages IDE</title>
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#020617;
-  color:white;
-}
-.container{
-  max-width:400px;
-  margin:50px auto;
-  padding:20px;
-  background:#0f172a;
-  border-radius:10px;
-}
-input,button{
-  width:100%;
-  padding:10px;
-  margin:8px 0;
-  border:none;
-  border-radius:6px;
-}
-input{background:#1e293b;color:white;}
-button{
-  background:#16a34a;
-  color:white;
-  cursor:pointer;
-}
-button:hover{opacity:0.8;}
-#dashboard{display:none;}
-.file-box{
-  background:#1e293b;
-  padding:10px;
-  border-radius:6px;
-  margin-top:10px;
-}
+body{margin:0;display:flex;height:100vh;font-family:Arial;}
+#editor{width:50%;padding:10px;}
+#preview{width:50%;border:none;}
+textarea{width:100%;height:80%;}
+button{padding:10px;margin-top:10px;background:#16a34a;color:white;border:none;}
 </style>
 </head>
 <body>
 
-<div class="container" id="authBox">
-<h2>Green Pages</h2>
-<input type="email" id="email" placeholder="Email">
-<input type="password" id="password" placeholder="Password">
-<button onclick="signup()">Sign Up</button>
-<button onclick="login()">Login</button>
+<div id="editor">
+<h2>Green Pages IDE</h2>
+<input id="sitename" placeholder="Site Name">
+<textarea id="code"><h1>Hello Apex 🚀</h1></textarea>
+<button onclick="preview()">Preview</button>
+<button onclick="deploy()">Deploy</button>
+<p id="msg"></p>
 </div>
 
-<div class="container" id="dashboard">
-<h2>Dashboard</h2>
-<p id="userEmail"></p>
-<input type="file" id="fileInput">
-<button onclick="uploadFile()">Upload File</button>
-<button onclick="logout()">Logout</button>
-<div id="status"></div>
-</div>
+<iframe id="preview"></iframe>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBJ-Ki5RueLv0_JatYBaoEatlZS4WD9ZMY",
-  authDomain: "greenpages-cc200.firebaseapp.com",
-  databaseURL: "https://greenpages-cc200-default-rtdb.firebaseio.com",
-  projectId: "greenpages-cc200",
-  storageBucket: "greenpages-cc200.firebasestorage.app",
-  messagingSenderId: "939676595663",
-  appId: "1:939676595663:web:39fe97fe23f31bebcd4eba"
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const storage = getStorage();
+const db = getFirestore();
 
-window.signup = function(){
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  createUserWithEmailAndPassword(auth,email,password)
-  .then(()=>alert("Signup Success"))
-  .catch(e=>alert(e.message));
+window.preview = function(){
+  const code = document.getElementById("code").value;
+  document.getElementById("preview").srcdoc = code;
 }
 
-window.login = function(){
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  signInWithEmailAndPassword(auth,email,password)
-  .catch(e=>alert(e.message));
-}
+window.deploy = async function(){
+  const name = document.getElementById("sitename").value;
+  const code = document.getElementById("code").value;
 
-window.logout = function(){
-  signOut(auth);
-}
+  if(!name) return alert("Enter site name");
 
-onAuthStateChanged(auth,(user)=>{
-  if(user){
-    document.getElementById("authBox").style.display="none";
-    document.getElementById("dashboard").style.display="block";
-    document.getElementById("userEmail").innerText="Logged in as: "+user.email;
-  }else{
-    document.getElementById("authBox").style.display="block";
-    document.getElementById("dashboard").style.display="none";
-  }
-});
-
-window.uploadFile = function(){
-  const file = document.getElementById("fileInput").files[0];
-  if(!file) return alert("Select file first");
-
-  const user = auth.currentUser;
-  const storageRef = ref(storage, "sites/"+user.uid+"/"+file.name);
-
-  uploadBytes(storageRef,file).then(()=>{
-    document.getElementById("status").innerHTML=
-    "<div class='file-box'>Uploaded: "+file.name+"</div>";
+  await setDoc(doc(db,"sites",name),{
+    html: code,
+    created: Date.now()
   });
-}
 
+  document.getElementById("msg").innerText =
+  "Deployed at: greenpages.web.app/sites/"+name;
+}
 </script>
 
 </body>
