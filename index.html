@@ -1,288 +1,129 @@
-<!DOCTYPE html>  <html lang="en">    <head>      <meta charset="UTF-8">        <title>GreenPages</title>        
-<meta name="viewport" content="width=device-width, initial-scale=1">  <style>        
-:root{        
-  --bg:#020617;        
-  --card:#020617cc;        
-  --border:#1e293b;        
-  --muted:#94a3b8;        
-  --green:#22c55e;        
-  --blue:#38bdf8;        
-  --red:#ef4444;        
-}    *{box-sizing:border-box}  body{  
-margin:0;  
-font-family:system-ui,-apple-system,Segoe UI,Roboto;  
-background:  
-radial-gradient(1200px 500px at top,#022c22 0%,transparent 60%),  
-var(--bg);  
-color:#e5e7eb;  
-}  /* HEADER */
-header{
-padding:16px 24px;
-border-bottom:1px solid var(--border);
-display:flex;
-justify-content:space-between;
-align-items:center;
-backdrop-filter:blur(12px);
-position:sticky;
-top:0;
-z-index:10;
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Green Pages</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#020617;
+  color:white;
 }
-
-header b{
-font-size:18px;
-letter-spacing:.4px;
+.container{
+  max-width:400px;
+  margin:50px auto;
+  padding:20px;
+  background:#0f172a;
+  border-radius:10px;
 }
-
-/* APP */
-#app{
-max-width:1150px;
-margin:auto;
-padding:26px 20px 80px;
+input,button{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border:none;
+  border-radius:6px;
 }
-
-/* CARD */
-.card{
-background:linear-gradient(180deg,#020617ee,#020617aa);
-border:1px solid var(--border);
-border-radius:18px;
-padding:18px;
-margin-bottom:16px;
-box-shadow:
-0 0 0 1px #020617 inset,
-0 20px 40px -20px black;
-animation:fade .35s ease;
-}
-
-@keyframes fade{
-from{opacity:0;transform:translateY(6px)}
-to{opacity:1;transform:none}
-}
-
-/* ROW */
-.row{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:12px;
-flex-wrap:wrap;
-}
-
-/* BUTTONS */
+input{background:#1e293b;color:white;}
 button{
-padding:9px 16px;
-border:none;
-border-radius:10px;
-font-weight:600;
-cursor:pointer;
-transition:.25s;
+  background:#16a34a;
+  color:white;
+  cursor:pointer;
 }
-
-button:hover{
-transform:translateY(-1px);
-filter:brightness(1.1);
+button:hover{opacity:0.8;}
+#dashboard{display:none;}
+.file-box{
+  background:#1e293b;
+  padding:10px;
+  border-radius:6px;
+  margin-top:10px;
 }
+</style>
+</head>
+<body>
 
-.green{
-background:linear-gradient(135deg,#22c55e,#4ade80);
-color:#022c22;
-}
+<div class="container" id="authBox">
+<h2>Green Pages</h2>
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+<button onclick="signup()">Sign Up</button>
+<button onclick="login()">Login</button>
+</div>
 
-.gray{
-background:#334155;
-color:white;
-}
+<div class="container" id="dashboard">
+<h2>Dashboard</h2>
+<p id="userEmail"></p>
+<input type="file" id="fileInput">
+<button onclick="uploadFile()">Upload File</button>
+<button onclick="logout()">Logout</button>
+<div id="status"></div>
+</div>
 
-.red{
-background:linear-gradient(135deg,#ef4444,#f87171);
-color:white;
-}
+<script type="module">
 
-/* INPUT */
-input{
-width:100%;
-padding:12px;
-border-radius:12px;
-border:1px solid var(--border);
-background:#020617;
-color:white;
-font-size:15px;
-}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-/* TEXTAREA */
-textarea{
-width:100%;
-height:300px;
-background:
-linear-gradient(transparent 95%,#022c22),
-#020617;
-color:#22c55e;
-border:1px solid var(--border);
-border-radius:16px;
-padding:18px;
-font-family:ui-monospace,monospace;
-font-size:14px;
-outline:none;
-line-height:1.6;
-}
-
-textarea:focus{
-border-color:#22c55e;
-box-shadow:0 0 0 2px #22c55e33;
-}
-
-/* PREVIEW */
-iframe{
-width:100%;
-height:340px;
-border-radius:16px;
-border:1px solid var(--border);
-background:white;
-margin-top:14px;
-}
-
-/* LINKS */
-a{
-color:var(--blue);
-text-decoration:none;
-font-weight:500;
-}
-a:hover{text-decoration:underline}
-
-/* AUTH */
-#auth button{margin-left:10px}
-
-/* MOBILE */
-@media(max-width:600px){
-textarea{height:240px}
-iframe{height:280px}
-}
-</style>  </head>  <body>
-
-<header>        
-  <b>🌿 GreenPages</b>        
-  <div id="auth"></div>        
-</header>  <div id="app"></div>  <!-- Firebase -->  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>  <script>        
-/* FIREBASE */        
-firebase.initializeApp({        
-  apiKey: "AIzaSyBJ-Ki5RueLv0_JatYBaoEatlZS4WD9ZMY",        
-  authDomain: "greenpages-cc200.firebaseapp.com",        
-  databaseURL: "https://greenpages-cc200-default-rtdb.firebaseio.com",        
-  projectId: "greenpages-cc200",        
-  storageBucket: "greenpages-cc200.firebasestorage.app",        
-  messagingSenderId: "939676595663",        
-  appId: "1:939676595663:web:39fe97fe23f31bebcd4eba"        
-});    const auth = firebase.auth();    
-const db = firebase.database();    
-const app = document.getElementById("app");    
-const authBox = document.getElementById("auth");  /* STATE */  
-let tempCode = localStorage.getItem("tempCode") ||  <!DOCTYPE html><html><body><h1>Hello GreenPages 🌿</h1></body></html>;  let editingId = null;  /* AUTH */
-auth.onAuthStateChanged(user=>{
-const q = new URLSearchParams(location.search);
-
-if(q.get("site")){
-db.ref("sites/"+q.get("site")).once("value", s=>{
-if(s.exists()){
-document.open();
-document.write(s.val().html);
-document.close();
-}else{
-app.innerHTML="<h2>Site not found</h2>";
-}
-});
-return;
-}
-
-if(user){
-authBox.innerHTML = ${user.displayName}     <button class="gray" onclick="auth.signOut()">Logout</button>;
-dashboard();
-}else{
-authBox.innerHTML = <button class="green" onclick="login()">Login</button>;
-app.innerHTML = <h2>Login to use GreenPages 🌿</h2>;
-}
-});
-
-function login(){
-auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-}
-
-/* DASHBOARD */
-function dashboard(){
-editingId=null;
-app.innerHTML=    <div class="card row">     <h2>Dashboard</h2>     <button class="green" onclick="newSite()">+ New Site</button>     </div>     <div id="list"></div>    ;
-
-const list=document.getElementById("list");
-list.innerHTML="";
-
-db.ref("sites").orderByChild("uid")
-.equalTo(auth.currentUser.uid)
-.once("value", snap=>{
-snap.forEach(s=>{
-const d=s.val();
-list.innerHTML+=    <div class="card row">     <b>${d.name}</b>     <div>     <a href="?site=${s.key}" target="_blank">Open</a>     <button class="gray" onclick="editSite('${s.key}')">Edit</button>     <button class="red" onclick="delSite('${s.key}')">Delete</button>     </div>     </div>    ;
-});
-});
-}
-
-function delSite(id){
-if(confirm("Delete site?")){
-db.ref("sites/"+id).remove();
-dashboard();
-}
-}
-
-/* IDE */
-function newSite(){
-editingId=null;
-tempCode=<!DOCTYPE html><html><body><h1>Hello GreenPages 🌿</h1></body></html>;
-openIDE();
-}
-
-function editSite(id){
-db.ref("sites/"+id).once("value", s=>{
-editingId=id;
-tempCode=s.val().html;
-openIDE();
-});
-}
-
-function openIDE(){
-app.innerHTML=`
-
-<div class="card">    
-<textarea id="code">${tempCode}</textarea><br><br>  <button class="gray" onclick="preview()">Preview</button>    
-<button class="green" onclick="deployUI()">Deploy</button>    
-<button class="gray" onclick="dashboard()">Back</button>  </div>        
-<iframe id="view"></iframe>  `;    
-preview();    
-}  function preview(){  
-tempCode=document.getElementById("code").value;  
-document.getElementById("view").srcdoc=tempCode;  
-}  /* DEPLOY */
-function deployUI(){
-app.innerHTML=  <div class="card">   <input id="name" placeholder="site-name"><br><br>   <button class="green" onclick="deploy()">Confirm Deploy</button>   <button class="gray" onclick="openIDE()">Back</button>   </div>  ;
-}
-
-function deploy(){
-const name=document.getElementById("name").value.trim();
-if(!name) return alert("Enter site name");
-
-const data={
-uid:auth.currentUser.uid,
-name,
-html:tempCode,
-time:Date.now()
+const firebaseConfig = {
+  apiKey: "AIzaSyBJ-Ki5RueLv0_JatYBaoEatlZS4WD9ZMY",
+  authDomain: "greenpages-cc200.firebaseapp.com",
+  databaseURL: "https://greenpages-cc200-default-rtdb.firebaseio.com",
+  projectId: "greenpages-cc200",
+  storageBucket: "greenpages-cc200.firebasestorage.app",
+  messagingSenderId: "939676595663",
+  appId: "1:939676595663:web:39fe97fe23f31bebcd4eba"
 };
 
-if(editingId){
-db.ref("sites/"+editingId).update(data);
-alert("Updated ✅");
-}else{
-db.ref("sites").push(data);
-alert("Deployed 🚀");
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const storage = getStorage();
+
+window.signup = function(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  createUserWithEmailAndPassword(auth,email,password)
+  .then(()=>alert("Signup Success"))
+  .catch(e=>alert(e.message));
 }
-dashboard();
+
+window.login = function(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  signInWithEmailAndPassword(auth,email,password)
+  .catch(e=>alert(e.message));
 }
+
+window.logout = function(){
+  signOut(auth);
+}
+
+onAuthStateChanged(auth,(user)=>{
+  if(user){
+    document.getElementById("authBox").style.display="none";
+    document.getElementById("dashboard").style.display="block";
+    document.getElementById("userEmail").innerText="Logged in as: "+user.email;
+  }else{
+    document.getElementById("authBox").style.display="block";
+    document.getElementById("dashboard").style.display="none";
+  }
+});
+
+window.uploadFile = function(){
+  const file = document.getElementById("fileInput").files[0];
+  if(!file) return alert("Select file first");
+
+  const user = auth.currentUser;
+  const storageRef = ref(storage, "sites/"+user.uid+"/"+file.name);
+
+  uploadBytes(storageRef,file).then(()=>{
+    document.getElementById("status").innerHTML=
+    "<div class='file-box'>Uploaded: "+file.name+"</div>";
+  });
+}
+
 </script>
 
-</body>        
+</body>
 </html>
