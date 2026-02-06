@@ -1,156 +1,203 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>GreenPages</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-:root{
---bg:#020617;
---card:#0f172a;
---border:#1e293b;
---green:#22c55e;
---blue:#38bdf8;
---red:#ef4444;
-}
-*{box-sizing:border-box}
-body{
-margin:0;
-font-family:system-ui;
-background:linear-gradient(135deg,#021d17,#020617);
-color:#e5e7eb;
-}
+<!DOCTYPE html>  <html lang="en">    <head>      <meta charset="UTF-8">        <title>GreenPages</title>        
+<meta name="viewport" content="width=device-width, initial-scale=1">  <style>        
+:root{        
+  --bg:#020617;        
+  --card:#020617cc;        
+  --border:#1e293b;        
+  --muted:#94a3b8;        
+  --green:#22c55e;        
+  --blue:#38bdf8;        
+  --red:#ef4444;        
+}    *{box-sizing:border-box}  body{  
+margin:0;  
+font-family:system-ui,-apple-system,Segoe UI,Roboto;  
+background:  
+radial-gradient(1200px 500px at top,#022c22 0%,transparent 60%),  
+var(--bg);  
+color:#e5e7eb;  
+}  /* HEADER */
 header{
-padding:18px 24px;
+padding:16px 24px;
 border-bottom:1px solid var(--border);
 display:flex;
 justify-content:space-between;
 align-items:center;
+backdrop-filter:blur(12px);
 position:sticky;
 top:0;
-background:#020617cc;
-backdrop-filter:blur(10px);
+z-index:10;
 }
+
+header b{
+font-size:18px;
+letter-spacing:.4px;
+}
+
+/* APP */
 #app{
-max-width:1100px;
+max-width:1150px;
 margin:auto;
-padding:25px 20px 80px;
+padding:26px 20px 80px;
 }
+
+/* CARD */
 .card{
-background:#0f172a;
+background:linear-gradient(180deg,#020617ee,#020617aa);
 border:1px solid var(--border);
 border-radius:18px;
-padding:20px;
+padding:18px;
 margin-bottom:16px;
+box-shadow:
+0 0 0 1px #020617 inset,
+0 20px 40px -20px black;
+animation:fade .35s ease;
 }
+
+@keyframes fade{
+from{opacity:0;transform:translateY(6px)}
+to{opacity:1;transform:none}
+}
+
+/* ROW */
 .row{
 display:flex;
 justify-content:space-between;
 align-items:center;
+gap:12px;
 flex-wrap:wrap;
-gap:10px;
 }
+
+/* BUTTONS */
 button{
-padding:10px 16px;
+padding:9px 16px;
 border:none;
 border-radius:10px;
-cursor:pointer;
 font-weight:600;
+cursor:pointer;
+transition:.25s;
 }
-.green{background:#22c55e;color:#022c22;}
-.gray{background:#334155;color:white;}
-.red{background:#ef4444;color:white;}
-.blue{background:#38bdf8;color:#021d3a;}
-input,textarea{
+
+button:hover{
+transform:translateY(-1px);
+filter:brightness(1.1);
+}
+
+.green{
+background:linear-gradient(135deg,#22c55e,#4ade80);
+color:#022c22;
+}
+
+.gray{
+background:#334155;
+color:white;
+}
+
+.red{
+background:linear-gradient(135deg,#ef4444,#f87171);
+color:white;
+}
+
+/* INPUT */
+input{
 width:100%;
 padding:12px;
 border-radius:12px;
 border:1px solid var(--border);
 background:#020617;
 color:white;
+font-size:15px;
 }
+
+/* TEXTAREA */
 textarea{
-height:320px;
-font-family:monospace;
+width:100%;
+height:300px;
+background:
+linear-gradient(transparent 95%,#022c22),
+#020617;
 color:#22c55e;
+border:1px solid var(--border);
+border-radius:16px;
+padding:18px;
+font-family:ui-monospace,monospace;
+font-size:14px;
+outline:none;
+line-height:1.6;
 }
+
+textarea:focus{
+border-color:#22c55e;
+box-shadow:0 0 0 2px #22c55e33;
+}
+
+/* PREVIEW */
 iframe{
 width:100%;
-height:350px;
-border-radius:12px;
+height:340px;
+border-radius:16px;
 border:1px solid var(--border);
 background:white;
 margin-top:14px;
 }
-.plan-badge{
-padding:5px 10px;
-border-radius:20px;
-font-size:12px;
-font-weight:bold;
+
+/* LINKS */
+a{
+color:var(--blue);
+text-decoration:none;
+font-weight:500;
 }
-.free{background:#334155}
-.normal{background:#1e3a8a}
-.owner{background:#14532d}
-</style>
-</head>
-<body>
-
-<header>
-<b>🌿 GreenPages</b>
-<div id="auth"></div>
-</header>
-
-<div id="app"></div>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-<script>
-
-/* FIREBASE */
-firebase.initializeApp({
-  apiKey: "AIzaSyBJ-Ki5RueLv0_JatYBaoEatlZS4WD9ZMY",
-  authDomain: "greenpages-cc200.firebaseapp.com",
-  databaseURL: "https://greenpages-cc200-default-rtdb.firebaseio.com",
-  projectId: "greenpages-cc200",
-  storageBucket: "greenpages-cc200.firebasestorage.app",
-  messagingSenderId: "939676595663",
-  appId: "1:939676595663:web:39fe97fe23f31bebcd4eba"
-});
-
-const auth = firebase.auth();
-const db = firebase.database();
-const app = document.getElementById("app");
-const authBox = document.getElementById("auth");
-
-let tempCode='<!DOCTYPE html><html><body><h1>Hello GreenPages 🌿</h1></body></html>';
-let editingId=null;
-let userPlan="free";
-let expiry=null;
+a:hover{text-decoration:underline}
 
 /* AUTH */
+#auth button{margin-left:10px}
+
+/* MOBILE */
+@media(max-width:600px){
+textarea{height:240px}
+iframe{height:280px}
+}
+</style>  </head>  <body>
+
+<header>        
+  <b>🌿 GreenPages</b>        
+  <div id="auth"></div>        
+</header>  <div id="app"></div>  <!-- Firebase -->  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>  <script>        
+/* FIREBASE */        
+firebase.initializeApp({        
+  apiKey: "AIzaSyBJ-Ki5RueLv0_JatYBaoEatlZS4WD9ZMY",        
+  authDomain: "greenpages-cc200.firebaseapp.com",        
+  databaseURL: "https://greenpages-cc200-default-rtdb.firebaseio.com",        
+  projectId: "greenpages-cc200",        
+  storageBucket: "greenpages-cc200.firebasestorage.app",        
+  messagingSenderId: "939676595663",        
+  appId: "1:939676595663:web:39fe97fe23f31bebcd4eba"        
+});    const auth = firebase.auth();    
+const db = firebase.database();    
+const app = document.getElementById("app");    
+const authBox = document.getElementById("auth");  /* STATE */  
+let tempCode = localStorage.getItem("tempCode") ||  <!DOCTYPE html><html><body><h1>Hello GreenPages 🌿</h1></body></html>;  let editingId = null;  /* AUTH */
 auth.onAuthStateChanged(user=>{
-const q=new URLSearchParams(location.search);
+const q = new URLSearchParams(location.search);
 
 if(q.get("site")){
-db.ref("sites/"+q.get("site")).once("value",s=>{
+db.ref("sites/"+q.get("site")).once("value", s=>{
 if(s.exists()){
 document.open();
 document.write(s.val().html);
 document.close();
+}else{
+app.innerHTML="<h2>Site not found</h2>";
 }
 });
 return;
 }
 
 if(user){
-loadPlan();
-authBox.innerHTML=`${user.displayName}
-<button class="gray" onclick="auth.signOut()">Logout</button>`;
+authBox.innerHTML = ${user.displayName}     <button class="gray" onclick="auth.signOut()">Logout</button>;
+dashboard();
 }else{
-authBox.innerHTML=`<button class="green" onclick="login()">Login</button>`;
-app.innerHTML="<h2>Login to continue 🌿</h2>";
+authBox.innerHTML = <button class="green" onclick="login()">Login</button>;
+app.innerHTML = <h2>Login to use GreenPages 🌿</h2>;
 }
 });
 
@@ -158,135 +205,40 @@ function login(){
 auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 }
 
-/* PLAN */
-function loadPlan(){
-db.ref("users/"+auth.currentUser.uid).once("value",s=>{
-if(s.exists()){
-userPlan=s.val().plan||"free";
-expiry=s.val().expiry||null;
-}
-dashboard();
-});
-}
-
-function planBadge(){
-if(userPlan==="owner") return `<span class="plan-badge owner">OWNER</span>`;
-if(userPlan==="normal") return `<span class="plan-badge normal">PRO</span>`;
-return `<span class="plan-badge free">FREE</span>`;
-}
-
 /* DASHBOARD */
 function dashboard(){
 editingId=null;
-app.innerHTML=`
-<div class="card row">
-<h2>Dashboard ${planBadge()}</h2>
-<div>
-<button class="blue" onclick="redeemUI()">Redeem</button>
-<button class="green" onclick="newSite()">+ New Site</button>
-</div>
-</div>
-<div id="list"></div>
-`;
+app.innerHTML=    <div class="card row">     <h2>Dashboard</h2>     <button class="green" onclick="newSite()">+ New Site</button>     </div>     <div id="list"></div>    ;
+
 const list=document.getElementById("list");
+list.innerHTML="";
+
 db.ref("sites").orderByChild("uid")
 .equalTo(auth.currentUser.uid)
-.once("value",snap=>{
+.once("value", snap=>{
 snap.forEach(s=>{
 const d=s.val();
-list.innerHTML+=`
-<div class="card row">
-<b>${d.name}</b>
-<div>
-<a href="?site=${s.key}" target="_blank">Open</a>
-<button class="gray" onclick="editSite('${s.key}')">Edit</button>
-<button class="red" onclick="delSite('${s.key}')">Delete</button>
-</div>
-</div>`;
+list.innerHTML+=    <div class="card row">     <b>${d.name}</b>     <div>     <a href="?site=${s.key}" target="_blank">Open</a>     <button class="gray" onclick="editSite('${s.key}')">Edit</button>     <button class="red" onclick="delSite('${s.key}')">Delete</button>     </div>     </div>    ;
 });
 });
 }
 
-/* LIMIT */
-function canCreate(callback){
-db.ref("sites").orderByChild("uid")
-.equalTo(auth.currentUser.uid)
-.once("value",snap=>{
-let total=snap.numChildren();
-if(userPlan==="owner") return callback(true);
-if(userPlan==="normal"){
-if(Date.now()>expiry){
-alert("Plan expired");
-userPlan="free";
-db.ref("users/"+auth.currentUser.uid).set({plan:"free"});
-return callback(false);
+function delSite(id){
+if(confirm("Delete site?")){
+db.ref("sites/"+id).remove();
+dashboard();
 }
-return callback(total<10);
-}
-return callback(total<2);
-});
-}
-
-/* REDEEM */
-function redeemUI(){
-app.innerHTML=`
-<div class="card">
-<h3>Redeem Code</h3>
-<input id="code" placeholder="Enter code"><br><br>
-<button class="green" onclick="redeem()">Redeem</button>
-<button class="gray" onclick="dashboard()">Back</button>
-</div>`;
-}
-
-function redeem(){
-const code=document.getElementById("code").value.trim();
-
-if(code==="HAGQ-OWNER"){
-db.ref("codes/owner").once("value",s=>{
-if(s.exists()){
-alert("Owner already used");
-}else{
-db.ref("codes/owner").set({used:true});
-db.ref("users/"+auth.currentUser.uid).set({plan:"owner"});
-alert("Owner unlocked 🔥");
-loadPlan();
-}
-});
-return;
-}
-
-if(code==="FTYER-LAW785"){
-db.ref("codes/normal").once("value",s=>{
-let used=s.val()?.count||0;
-if(used>=2){
-alert("Code fully used");
-}else{
-db.ref("codes/normal").set({count:used+1});
-db.ref("users/"+auth.currentUser.uid).set({
-plan:"normal",
-expiry:Date.now()+365*24*60*60*1000
-});
-alert("Pro activated 🚀");
-loadPlan();
-}
-});
-return;
-}
-
-alert("Invalid code");
 }
 
 /* IDE */
 function newSite(){
-canCreate(ok=>{
-if(!ok){alert("Plan limit reached");return;}
 editingId=null;
+tempCode=<!DOCTYPE html><html><body><h1>Hello GreenPages 🌿</h1></body></html>;
 openIDE();
-});
 }
 
 function editSite(id){
-db.ref("sites/"+id).once("value",s=>{
+db.ref("sites/"+id).once("value", s=>{
 editingId=id;
 tempCode=s.val().html;
 openIDE();
@@ -295,33 +247,24 @@ openIDE();
 
 function openIDE(){
 app.innerHTML=`
-<div class="card">
-<textarea id="code">${tempCode}</textarea><br><br>
-<button class="gray" onclick="preview()">Preview</button>
-<button class="green" onclick="deployUI()">Deploy</button>
-<button class="gray" onclick="dashboard()">Back</button>
-</div>
-<iframe id="view"></iframe>`;
-preview();
-}
 
-function preview(){
-tempCode=document.getElementById("code").value;
-document.getElementById("view").srcdoc=tempCode;
-}
-
+<div class="card">    
+<textarea id="code">${tempCode}</textarea><br><br>  <button class="gray" onclick="preview()">Preview</button>    
+<button class="green" onclick="deployUI()">Deploy</button>    
+<button class="gray" onclick="dashboard()">Back</button>  </div>        
+<iframe id="view"></iframe>  `;    
+preview();    
+}  function preview(){  
+tempCode=document.getElementById("code").value;  
+document.getElementById("view").srcdoc=tempCode;  
+}  /* DEPLOY */
 function deployUI(){
-app.innerHTML=`
-<div class="card">
-<input id="name" placeholder="site-name"><br><br>
-<button class="green" onclick="deploy()">Confirm Deploy</button>
-<button class="gray" onclick="openIDE()">Back</button>
-</div>`;
+app.innerHTML=  <div class="card">   <input id="name" placeholder="site-name"><br><br>   <button class="green" onclick="deploy()">Confirm Deploy</button>   <button class="gray" onclick="openIDE()">Back</button>   </div>  ;
 }
 
 function deploy(){
 const name=document.getElementById("name").value.trim();
-if(!name)return alert("Enter name");
+if(!name) return alert("Enter site name");
 
 const data={
 uid:auth.currentUser.uid,
@@ -332,19 +275,14 @@ time:Date.now()
 
 if(editingId){
 db.ref("sites/"+editingId).update(data);
+alert("Updated ✅");
 }else{
 db.ref("sites").push(data);
+alert("Deployed 🚀");
 }
 dashboard();
 }
-
-function delSite(id){
-if(confirm("Delete site?")){
-db.ref("sites/"+id).remove();
-dashboard();
-}
-}
-
 </script>
-</body>
+
+</body>        
 </html>
