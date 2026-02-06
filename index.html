@@ -5,107 +5,54 @@
 <title>Green Pages</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#000;
-  color:#00ff88;
-}
-.header{
-  padding:15px;
-  background:#001a0f;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-button{
-  background:#00ff88;
-  border:none;
-  padding:8px 12px;
-  cursor:pointer;
-  border-radius:5px;
-}
+body{margin:0;font-family:Arial;background:#000;color:#00ff88;}
+.header{padding:15px;background:#001a0f;display:flex;justify-content:space-between;}
+button{background:#00ff88;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;}
 button:hover{opacity:0.8;}
-.dashboard{
-  padding:20px;
-}
-.site-card{
-  background:#001a0f;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:6px;
-}
-#editorBox{
-  display:none;
-  padding:20px;
-}
-textarea{
-  width:100%;
-  height:300px;
-  background:#001a0f;
-  color:#00ff88;
-  border:none;
-  padding:10px;
-}
-iframe{
-  width:100%;
-  height:300px;
-  background:white;
-}
-input{
-  background:#001a0f;
-  color:#00ff88;
-  border:none;
-  padding:8px;
-  width:100%;
-}
-.auth{
-  max-width:400px;
-  margin:80px auto;
-  padding:20px;
-  background:#001a0f;
-  border-radius:8px;
-}
+.dashboard{padding:20px;}
+.card{background:#001a0f;padding:10px;margin:10px 0;border-radius:6px;}
+textarea{width:100%;height:250px;background:#001a0f;color:#00ff88;border:none;padding:10px;}
+iframe{width:100%;height:250px;background:white;}
+input{background:#001a0f;color:#00ff88;border:none;padding:8px;width:100%;}
+#editor{display:none;padding:20px;}
 </style>
 </head>
 <body>
 
-<div class="auth" id="authBox">
+<div id="loginBox" style="text-align:center;margin-top:100px;">
 <h2>Green Pages</h2>
-<input id="email" placeholder="Email"><br><br>
-<input id="password" type="password" placeholder="Password"><br><br>
-<button onclick="signup()">Sign Up</button>
-<button onclick="login()">Login</button>
+<button onclick="googleLogin()">Login with Google</button>
 </div>
 
-<div id="mainApp" style="display:none;">
+<div id="app" style="display:none;">
 <div class="header">
-<h3>Green Pages Dashboard</h3>
+<h3>Dashboard</h3>
 <button onclick="logout()">Logout</button>
 </div>
 
 <div class="dashboard" id="dashboard">
 <button onclick="newSite()">+ New Site</button>
-<p id="limitInfo"></p>
+<p id="limitText"></p>
 <div id="siteList"></div>
 </div>
 
-<div id="editorBox">
+<div id="editor">
 <h3 id="editorTitle"></h3>
-<input id="siteNameInput" placeholder="Site Name"><br><br>
-<textarea id="codeArea"><h1 style="color:green;">Hello World</h1></textarea><br>
+<input id="siteName" placeholder="Site Name"><br><br>
+<textarea id="codeArea"><h1 style="color:green;">Hello Apex 🚀</h1></textarea><br><br>
 <button onclick="preview()">Preview</button>
 <button onclick="deploy()">Deploy</button>
-<button onclick="backDashboard()">Back</button>
-<br><br>
+<button onclick="back()">Back</button>
+<p id="deployStatus"></p>
+<br>
 <iframe id="previewFrame"></iframe>
 </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBJ-Ki5RueLv0_JatYBaoEatlZS4WD9ZMY",
@@ -117,95 +64,120 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
 
-let currentUser = null;
+let userData=null;
 
-window.signup = ()=> {
-  createUserWithEmailAndPassword(auth,
-  email.value,password.value)
-  .catch(e=>alert(e.message));
-}
-
-window.login = ()=> {
-  signInWithEmailAndPassword(auth,
-  email.value,password.value)
-  .catch(e=>alert(e.message));
+window.googleLogin = async()=>{
+  const provider=new GoogleAuthProvider();
+  await signInWithPopup(auth,provider);
 }
 
 window.logout = ()=> signOut(auth);
 
-onAuthStateChanged(auth, async(user)=>{
+onAuthStateChanged(auth,(user)=>{
   if(user){
-    currentUser = user;
-    authBox.style.display="none";
-    mainApp.style.display="block";
+    userData=user;
+    loginBox.style.display="none";
+    app.style.display="block";
     loadSites();
   }else{
-    authBox.style.display="block";
-    mainApp.style.display="none";
+    loginBox.style.display="block";
+    app.style.display="none";
   }
 });
 
 async function loadSites(){
-  const q = query(collection(db,"sites"),
-  where("uid","==",currentUser.uid));
-  const snap = await getDocs(q);
+  const q=query(collection(db,"sites"),where("uid","==",userData.uid));
+  const snap=await getDocs(q);
   siteList.innerHTML="";
-  limitInfo.innerText="Sites: "+snap.size+" / 5";
+  limitText.innerText="Sites: "+snap.size+" / 5";
 
-  snap.forEach(doc=>{
-    const data = doc.data();
-    siteList.innerHTML += `
-    <div class="site-card">
-      <b>${data.name}</b><br>
-      <button onclick="openSite('${data.name}','${doc.id}')">Edit</button>
+  snap.forEach(d=>{
+    const data=d.data();
+    siteList.innerHTML+=`
+    <div class="card">
+      <b>${data.name}</b><br><br>
+      <button onclick="openSite('${data.name}')">Open</button>
+      <button onclick="deleteSite('${d.id}')">Delete</button>
     </div>`;
   });
 }
 
-window.newSite = async ()=>{
-  const q = query(collection(db,"sites"),
-  where("uid","==",currentUser.uid));
-  const snap = await getDocs(q);
-  if(snap.size >= 5){
+window.newSite=async()=>{
+  const q=query(collection(db,"sites"),where("uid","==",userData.uid));
+  const snap=await getDocs(q);
+  if(snap.size>=5){
     alert("5 site limit reached");
     return;
   }
-  editorBox.style.display="block";
+  editor.style.display="block";
   dashboard.style.display="none";
-  editorTitle.innerText="Create New Site";
+  editorTitle.innerText="Create Site";
+  siteName.value="";
+  codeArea.value="";
 }
 
-window.openSite = (name,id)=>{
-  editorBox.style.display="block";
-  dashboard.style.display="none";
-  editorTitle.innerText="Editing: "+name;
+window.preview=()=>{
+  previewFrame.srcdoc=codeArea.value;
 }
 
-window.backDashboard = ()=>{
-  editorBox.style.display="none";
-  dashboard.style.display="block";
-  loadSites();
-}
-
-window.preview = ()=>{
-  previewFrame.srcdoc = codeArea.value;
-}
-
-window.deploy = async ()=>{
-  const name = siteNameInput.value;
+window.deploy=async()=>{
+  const name=siteName.value.trim();
   if(!name) return alert("Enter site name");
 
+  // check duplicate name
+  const q=query(collection(db,"sites"),
+  where("name","==",name),
+  where("uid","==",userData.uid));
+  const snap=await getDocs(q);
+
+  if(!snap.empty){
+    alert("Site name already exists");
+    return;
+  }
+
   await addDoc(collection(db,"sites"),{
-    uid:currentUser.uid,
+    uid:userData.uid,
     name:name,
     html:codeArea.value,
     created:Date.now()
   });
 
-  alert("Deployed Successfully 🚀");
-  backDashboard();
+  deployStatus.innerText="Deployed ✅";
+  back();
 }
 
+window.deleteSite=async(id)=>{
+  await deleteDoc(doc(db,"sites",id));
+  loadSites();
+}
+
+window.openSite=(name)=>{
+  const url=location.origin+"?view="+name;
+  window.open(url,"_blank");
+}
+
+window.back=()=>{
+  editor.style.display="none";
+  dashboard.style.display="block";
+  deployStatus.innerText="";
+  loadSites();
+}
+
+// public view mode
+const params=new URLSearchParams(location.search);
+const view=params.get("view");
+
+if(view){
+  document.body.innerHTML="Loading...";
+  const q=query(collection(db,"sites"),where("name","==",view));
+  getDocs(q).then(snap=>{
+    if(!snap.empty){
+      document.body.innerHTML=snap.docs[0].data().html;
+    }else{
+      document.body.innerHTML="Site not found";
+    }
+  });
+}
 </script>
 
 </body>
