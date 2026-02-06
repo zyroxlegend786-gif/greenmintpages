@@ -7,169 +7,154 @@
 
 <style>
 :root{
-  --bg:#020617;
-  --card:#020617cc;
-  --border:#1e293b;
-  --green:#22c55e;
-  --blue:#38bdf8;
-  --red:#ef4444;
+--bg:#020617;
+--card:#0f172a;
+--border:#1e293b;
+--muted:#94a3b8;
+--green:#22c55e;
+--blue:#38bdf8;
+--red:#ef4444;
 }
 
 *{box-sizing:border-box}
-
 body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto;
-  background:
-    radial-gradient(1200px 500px at top,#022c22 0%,transparent 60%),
-    var(--bg);
-  color:#e5e7eb;
+margin:0;
+font-family:system-ui,-apple-system;
+background:linear-gradient(135deg,#021d17,#020617);
+color:#e5e7eb;
 }
 
 header{
-  padding:16px 24px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  backdrop-filter:blur(12px);
-  position:sticky;
-  top:0;
+padding:18px 24px;
+border-bottom:1px solid var(--border);
+display:flex;
+justify-content:space-between;
+align-items:center;
+backdrop-filter:blur(14px);
+position:sticky;
+top:0;
+z-index:10;
+background:#020617cc;
+}
+
+header b{
+font-size:19px;
+letter-spacing:.5px;
 }
 
 #app{
-  max-width:1150px;
-  margin:auto;
-  padding:26px 20px 80px;
+max-width:1150px;
+margin:auto;
+padding:30px 20px 80px;
 }
 
 .card{
-  background:linear-gradient(180deg,#020617ee,#020617aa);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:18px;
-  margin-bottom:16px;
-  box-shadow:0 20px 40px -20px black;
+background:linear-gradient(180deg,#0f172a,#0b1220);
+border:1px solid var(--border);
+border-radius:20px;
+padding:20px;
+margin-bottom:18px;
+box-shadow:0 15px 35px -15px black;
+animation:fade .3s ease;
+}
+
+@keyframes fade{
+from{opacity:0;transform:translateY(6px)}
+to{opacity:1}
 }
 
 .row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+flex-wrap:wrap;
 }
 
 button{
-  padding:9px 16px;
-  border:none;
-  border-radius:10px;
-  font-weight:600;
-  cursor:pointer;
+padding:10px 18px;
+border:none;
+border-radius:12px;
+font-weight:600;
+cursor:pointer;
+transition:.25s;
 }
-button:hover{transform:translateY(-1px)}
 
-.green{background:#22c55e;color:#022c22}
-.gray{background:#334155;color:white}
-.red{background:#ef4444;color:white}
+button:hover{
+transform:translateY(-2px);
+filter:brightness(1.1);
+}
+
+.green{background:linear-gradient(135deg,#22c55e,#4ade80);color:#022c22;}
+.gray{background:#334155;color:white;}
+.red{background:linear-gradient(135deg,#ef4444,#f87171);color:white;}
+.blue{background:linear-gradient(135deg,#38bdf8,#60a5fa);color:#021d3a;}
 
 input{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:#020617;
-  color:white;
+width:100%;
+padding:12px;
+border-radius:14px;
+border:1px solid var(--border);
+background:#020617;
+color:white;
 }
 
 textarea{
-  width:100%;
-  height:300px;
-  background:#020617;
-  color:#22c55e;
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:18px;
-  font-family:monospace;
+width:100%;
+height:320px;
+background:#020617;
+color:#22c55e;
+border:1px solid var(--border);
+border-radius:16px;
+padding:18px;
+font-family:monospace;
 }
 
 iframe{
-  width:100%;
-  height:340px;
-  border-radius:16px;
-  border:1px solid var(--border);
-  background:white;
-  margin-top:14px;
+width:100%;
+height:350px;
+border-radius:16px;
+border:1px solid var(--border);
+background:white;
+margin-top:16px;
 }
 
-a{color:#38bdf8;text-decoration:none}
-#auth button{margin-left:10px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
 
-/* TERMINAL OVERLAY */
-#terminalOverlay{
-  position:fixed;
-  inset:0;
-  background:#020617dd;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
+.plan-badge{
+padding:6px 12px;
+border-radius:20px;
+font-size:12px;
+font-weight:700;
 }
 
-#terminal{
-  width:90%;
-  max-width:520px;
-  background:black;
-  border-radius:14px;
-  border:1px solid #22c55e55;
-  padding:16px;
-  font-family:ui-monospace,monospace;
-  color:#22c55e;
-  box-shadow:0 0 40px #000;
-}
+.free{background:#334155}
+.normal{background:#1e3a8a}
+.owner{background:#14532d}
 
-#terminal h4{
-  margin:0 0 10px;
-  color:#4ade80;
-  font-weight:600;
-}
-
-#logs div{
-  margin-bottom:6px;
-}
 </style>
 </head>
-
 <body>
+
 <header>
-  <b>🌿 GreenPages</b>
-  <div id="auth"></div>
+<b>🌿 GreenPages</b>
+<div id="auth"></div>
 </header>
 
 <div id="app"></div>
 
-<!-- TERMINAL -->
-<div id="terminalOverlay">
-  <div id="terminal">
-    <h4>GREENmint Terminal</h4>
-    <div id="logs"></div>
-  </div>
-</div>
-
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
+
 firebase.initializeApp({
-  apiKey: "AIzaSyBJ-Ki5RueLv0_JatYBaoEatlZS4WD9ZMY",
-  authDomain: "greenpages-cc200.firebaseapp.com",
-  databaseURL: "https://greenpages-cc200-default-rtdb.firebaseio.com",
-  projectId: "greenpages-cc200",
-  storageBucket: "greenpages-cc200.firebasestorage.app",
-  messagingSenderId: "939676595663",
-  appId: "1:939676595663:web:39fe97fe23f31bebcd4eba"
+apiKey: "YOUR_KEY",
+authDomain: "YOUR_AUTH",
+databaseURL: "YOUR_DB",
+projectId: "YOUR_PROJECT"
 });
 
 const auth=firebase.auth();
@@ -177,184 +162,242 @@ const db=firebase.database();
 const app=document.getElementById("app");
 const authBox=document.getElementById("auth");
 
-let tempCode=`<!DOCTYPE html><html><body><h1>Hello GreenPages 🌿</h1></body></html>`;
+let tempCode='<!DOCTYPE html><html><body><h1>Hello GreenPages 🌿</h1></body></html>';
 let editingId=null;
-let currentView="dashboard";
+let userPlan="free";
+let expiry=null;
 
 /* AUTH */
 auth.onAuthStateChanged(user=>{
-  const q=new URLSearchParams(location.search);
+const q=new URLSearchParams(location.search);
 
-  if(q.get("site")){
-    db.ref("sites/"+q.get("site")).once("value",s=>{
-      if(s.exists()){
-        document.open();
-        document.write(s.val().html);
-        document.close();
-      }else app.innerHTML="<h2>Site not found</h2>";
-    });
-    return;
-  }
+if(q.get("site")){
+db.ref("sites/"+q.get("site")).once("value",s=>{
+if(s.exists()){
+document.open();
+document.write(s.val().html);
+document.close();
+}
+});
+return;
+}
 
-  if(user){
-    authBox.innerHTML=`${user.displayName}
-      <button class="gray" onclick="auth.signOut()">Logout</button>`;
-    dashboard();
-  }else{
-    authBox.innerHTML=`<button class="green" onclick="login()">Login</button>`;
-    app.innerHTML=`<h2>Login to use GreenPages 🌿</h2>`;
-  }
+if(user){
+loadPlan();
+authBox.innerHTML=`${user.displayName}
+<button class="gray" onclick="auth.signOut()">Logout</button>`;
+}else{
+authBox.innerHTML=`<button class="green" onclick="login()">Login</button>`;
+app.innerHTML="<h2>Login to continue 🌿</h2>";
+}
 });
 
 function login(){
-  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+}
+
+/* PLAN */
+function loadPlan(){
+db.ref("users/"+auth.currentUser.uid).once("value",s=>{
+if(s.exists()){
+userPlan=s.val().plan||"free";
+expiry=s.val().expiry||null;
+}
+dashboard();
+});
+}
+
+function planBadge(){
+if(userPlan==="owner") return `<span class="plan-badge owner">OWNER</span>`;
+if(userPlan==="normal") return `<span class="plan-badge normal">PRO</span>`;
+return `<span class="plan-badge free">FREE</span>`;
 }
 
 /* DASHBOARD */
 function dashboard(){
-  currentView="dashboard";
-  editingId=null;
-  app.innerHTML=`
-    <div class="card row">
-      <h2>Dashboard</h2>
-      <button class="green" onclick="newSite()">+ New Site</button>
-    </div>
-    <div id="list"></div>
-  `;
+editingId=null;
 
-  const list=document.getElementById("list");
-  list.innerHTML="";
+app.innerHTML=`
+<div class="card row">
+<h2>Dashboard ${planBadge()}</h2>
+<div>
+<button class="blue" onclick="redeemUI()">Redeem</button>
+<button class="green" onclick="newSite()">+ New Site</button>
+</div>
+</div>
+<div id="list"></div>
+`;
 
-  db.ref("sites").orderByChild("uid")
-  .equalTo(auth.currentUser.uid)
-  .once("value",snap=>{
-    snap.forEach(s=>{
-      const d=s.val();
-      list.innerHTML+=`
-        <div class="card row">
-          <b>${d.name}</b>
-          <div>
-            <a href="?site=${s.key}" target="_blank">Open</a>
-            <button class="gray" onclick="editSite('${s.key}')">Edit</button>
-            <button class="red" onclick="delSite('${s.key}')">Delete</button>
-          </div>
-        </div>`;
-    });
-  });
+const list=document.getElementById("list");
+let count=0;
+
+db.ref("sites").orderByChild("uid")
+.equalTo(auth.currentUser.uid)
+.once("value",snap=>{
+snap.forEach(s=>{
+count++;
+const d=s.val();
+list.innerHTML+=`
+<div class="card row">
+<b>${d.name}</b>
+<div>
+<a href="?site=${s.key}" target="_blank">Open</a>
+<button class="gray" onclick="editSite('${s.key}')">Edit</button>
+<button class="red" onclick="delSite('${s.key}')">Delete</button>
+</div>
+</div>
+`;
+});
+});
+
 }
 
-function delSite(id){
-  if(confirm("Delete site?")){
-    db.ref("sites/"+id).remove();
-    dashboard();
-  }
+/* LIMIT CHECK */
+function canCreate(callback){
+db.ref("sites").orderByChild("uid")
+.equalTo(auth.currentUser.uid)
+.once("value",snap=>{
+let total=snap.numChildren();
+
+if(userPlan==="owner") return callback(true);
+
+if(userPlan==="normal"){
+if(Date.now()>expiry){
+alert("Plan expired");
+userPlan="free";
+db.ref("users/"+auth.currentUser.uid).set({plan:"free"});
+return callback(false);
+}
+return callback(total<10);
+}
+
+return callback(total<2);
+});
+}
+
+/* REDEEM */
+function redeemUI(){
+app.innerHTML=`
+<div class="card">
+<h3>Redeem Code</h3>
+<input id="code" placeholder="Enter code"><br><br>
+<button class="green" onclick="redeem()">Redeem</button>
+<button class="gray" onclick="dashboard()">Back</button>
+</div>
+`;
+}
+
+function redeem(){
+const code=document.getElementById("code").value.trim();
+
+if(code==="HAGQ-OWNER"){
+db.ref("codes/owner").once("value",s=>{
+if(s.exists()){
+alert("Owner already used");
+}else{
+db.ref("codes/owner").set({used:true});
+db.ref("users/"+auth.currentUser.uid).set({plan:"owner"});
+alert("Owner unlocked 🔥");
+loadPlan();
+}
+});
+return;
+}
+
+if(code==="FTYER-LAW785"){
+db.ref("codes/normal").once("value",s=>{
+let used=s.val()?.count||0;
+if(used>=2){
+alert("Code fully used");
+}else{
+db.ref("codes/normal").set({count:used+1});
+db.ref("users/"+auth.currentUser.uid).set({
+plan:"normal",
+expiry:Date.now()+365*24*60*60*1000
+});
+alert("Pro activated 🚀");
+loadPlan();
+}
+});
+return;
+}
+
+alert("Invalid code");
 }
 
 /* IDE */
 function newSite(){
-  editingId=null;
-  tempCode=`<!DOCTYPE html><html><body><h1>Hello GreenPages 🌿</h1></body></html>`;
-  openIDE();
+canCreate(ok=>{
+if(!ok){alert("Plan limit reached");return;}
+editingId=null;
+openIDE();
+});
 }
 
 function editSite(id){
-  db.ref("sites/"+id).once("value",s=>{
-    editingId=id;
-    tempCode=s.val().html;
-    openIDE();
-  });
+db.ref("sites/"+id).once("value",s=>{
+editingId=id;
+tempCode=s.val().html;
+openIDE();
+});
 }
 
 function openIDE(){
-  currentView="ide";
-  app.innerHTML=`
-    <div class="card">
-      <textarea id="code">${tempCode}</textarea><br><br>
-      <button class="gray" onclick="preview()">Preview</button>
-      <button class="green" onclick="deployUI()">Deploy</button>
-      <button class="gray" onclick="dashboard()">Back</button>
-    </div>
-    <iframe id="view"></iframe>
-  `;
-  preview();
+app.innerHTML=`
+<div class="card">
+<textarea id="code">${tempCode}</textarea><br><br>
+<button class="gray" onclick="preview()">Preview</button>
+<button class="green" onclick="deployUI()">Deploy</button>
+<button class="gray" onclick="dashboard()">Back</button>
+</div>
+<iframe id="view"></iframe>
+`;
+preview();
 }
 
 function preview(){
-  tempCode=document.getElementById("code").value;
-  document.getElementById("view").srcdoc=tempCode;
-}
-
-/* DEPLOY UI */
-function deployUI(){
-  currentView="deploy";
-  app.innerHTML=`
-    <div class="card">
-      <input id="name" placeholder="site-name"><br><br>
-      <button class="green" onclick="deploy()">Confirm Deploy</button>
-      <button class="gray" onclick="openIDE()">Back</button>
-    </div>`;
-}
-
-/* TERMINAL SIM */
-function runTerminal(cb){
-  const overlay=document.getElementById("terminalOverlay");
-  const logs=document.getElementById("logs");
-  logs.innerHTML="";
-  overlay.style.display="flex";
-
-  const steps=[
-    "Connecting to GREENmint server...",
-    "Uploading site bundle...",
-    "Finalizing deployment...",
-    "✅ Deployed successfully"
-  ];
-
-  steps.forEach((msg,i)=>{
-    setTimeout(()=>{
-      const d=document.createElement("div");
-      d.textContent=msg;
-      logs.appendChild(d);
-      if(i===steps.length-1){
-        setTimeout(()=>{
-          overlay.style.display="none";
-          cb();
-        },800);
-      }
-    },i*1200);
-  });
+tempCode=document.getElementById("code").value;
+document.getElementById("view").srcdoc=tempCode;
 }
 
 /* DEPLOY */
-function deploy(){
-  const name=document.getElementById("name").value.trim();
-  if(!name) return alert("Enter site name");
-
-  const uid=auth.currentUser.uid;
-
-  runTerminal(()=>{
-    if(editingId){
-      db.ref("sites/"+editingId).update({
-        uid,name,html:tempCode,time:Date.now()
-      });
-      alert("Updated ✅");
-      return dashboard();
-    }
-
-    db.ref("sites").orderByChild("uid")
-    .equalTo(uid)
-    .once("value",snap=>{
-      if(snap.numChildren()>=5){
-        alert("❌ Limit reached: Only 5 sites allowed");
-        return;
-      }
-      db.ref("sites").push({
-        uid,name,html:tempCode,time:Date.now()
-      });
-      alert("Deployed 🚀");
-      dashboard();
-    });
-  });
+function deployUI(){
+app.innerHTML=`
+<div class="card">
+<input id="name" placeholder="site-name"><br><br>
+<button class="green" onclick="deploy()">Confirm Deploy</button>
+<button class="gray" onclick="openIDE()">Back</button>
+</div>
+`;
 }
+
+function deploy(){
+const name=document.getElementById("name").value.trim();
+if(!name)return alert("Enter name");
+
+const data={
+uid:auth.currentUser.uid,
+name,
+html:tempCode,
+time:Date.now()
+};
+
+if(editingId){
+db.ref("sites/"+editingId).update(data);
+}else{
+db.ref("sites").push(data);
+}
+
+dashboard();
+}
+
+function delSite(id){
+if(confirm("Delete site?")){
+db.ref("sites/"+id).remove();
+dashboard();
+}
+}
+
 </script>
 </body>
 </html>
